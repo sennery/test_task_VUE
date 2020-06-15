@@ -1,0 +1,26 @@
+{
+  "name": "test-task-front",
+  "version": "0.1.0",
+  "description": "Test task for Web-developer vacancy",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "server": "nodemon server.js"
+  },
+  "author": "Arsenii Likhachev",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "core-js": "^3.6.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "remove": "^0.1.5",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.4.0",
+    "@vue/cli-service": "~4.4.0",
+    "nodemon": "^2.0.4",
+    "vue-template-compiler": "^2.6.11"
+  }
+}
