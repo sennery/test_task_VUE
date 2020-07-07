@@ -9,7 +9,7 @@
         <hr class="line">
         <div class = 'list'>
             <Element v-for="file in dirData.fileList"  
-                v-bind:class = "{selected: current === file}" 
+                v-bind:class = "{selected: select(file)}" 
                 v-on:click.native = "changeCur(file)" 
                 v-bind:key = "file.fileName"
                 v-bind:file = "file" 
@@ -32,11 +32,20 @@ export default {
             this.$emit('updateData', this.dirData.path, disk)    
         },
         changeCur(file) {
-            this.$emit('curChanged', file);
+            this.$emit('curChanged', {...file, path: this.dirData.path});
         },
         updateData(fileName, disk) {
             if(!disk) disk = false;
             this.$emit('updateData', this.dirData.path, fileName, disk);
+        },
+        select(file) {
+            try {
+                return (this.current.fileName === file.fileName && this.current.path === this.dirData.path);
+            }
+            catch (e) {
+                console.log(e);
+                return false;
+            }
         }
     },
     name: 'Window',
