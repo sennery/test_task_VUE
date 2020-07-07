@@ -33,7 +33,7 @@ export default {
     },
     methods: {
         changeCur(current, path) {
-            this.current = current;
+            this.current = current;       
         },
         updateData1(path,fileName,disk){
             this.updateData(path,fileName,disk, 1);
@@ -85,16 +85,9 @@ export default {
         }
     },
     async mounted() {
-        let response = await fetch('http://localhost:3000/open', {
-                method: 'POST',
-                headers: {
-                    "Content-type": "text/plain"
-                },
-                body: 'C:/'
-            });
-        let result = await response.json();
-        this.dirData1 = result;
-        this.dirData2 = result;
+        this.sendPost('C:/', 'open').then( (value) => {
+            this.dirData1 = this.dirData2 = value;
+        });
     }
 }
 </script>
