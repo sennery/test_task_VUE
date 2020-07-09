@@ -14,7 +14,7 @@
         </div>
         <div class="dataWithTime">
             <span class = 'data'>
-                {{findDate(file.changeTime)}}
+                {{formatDate(file.changeTime)}}
             </span>
             <span class = 'size'>
                 {{file.size}}
@@ -28,7 +28,7 @@ export default {
     props:['file'],
     name: 'Element',
     methods: {
-        findDate(timestamp) {
+        formatDate(timestamp) {
             let date = new Date (timestamp);
             
             return ((date.getHours()<10)? ((date.getHours() == 0) ? '00' : '0' + date.getHours()): date.getHours()) + '.' 

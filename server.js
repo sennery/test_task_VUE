@@ -34,27 +34,27 @@ app.use(cors())
 
 app.get('/', (req, res) => res.sendFile('index.html'))
 
-app.post('/open', (req,res) =>{
-    res.json(directoryContent(path.normalize(req.body)))
+app.post('/open', (req,res) => {
+    res.json(directoryContent(path.normalize(req.body.path)))
 })
 
-app.post('/move', (req,res) =>{
-    fse.move(JSON.parse(req.body).obj, JSON.parse(req.body).pathTo, err => {
+app.post('/move', (req,res) => {
+    fse.move(req.body.obj, req.body.pathTo, err => {
         if (err) return console.error(err)
         res.json(responseForActions(req,res))
     })
 })
 
-app.post('/copy', (req,res) =>{
-    fse.copy(JSON.parse(req.body).obj, JSON.parse(req.body).pathTo, err => {
+app.post('/copy', (req,res) => {
+    fse.copy(req.body.obj, req.body.pathTo, err => {
         if (err) return console.error(err)
         res.json(responseForActions(req,res))
     })
 })
 
-app.post('/remove', (req,res) =>{
+app.post('/remove', (req,res) => {
     try {
-        remove.removeSync(path.normalize(JSON.parse(req.body).obj))
+        remove.removeSync(path.normalize(req.body.obj))
     } catch(err) {
         console.log(err)
     }
@@ -63,7 +63,7 @@ app.post('/remove', (req,res) =>{
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
-function directoryContent(dirPath){
+function directoryContent(dirPath) {
     let fileList = []
     fs.readdirSync(dirPath).forEach((arg) => {
         try {
@@ -100,10 +100,10 @@ function directoryContent(dirPath){
     }
 }
 
-function responseForActions(req,res){
+function responseForActions(req,res) {
     return {
-        dir1: directoryContent(path.normalize(path.parse(JSON.parse(req.body).obj).dir)),
-        dir2: directoryContent(path.normalize(path.parse(JSON.parse(req.body).pathTo).dir))
+        dir1: directoryContent(path.normalize(path.parse(req.body.obj).dir)),
+        dir2: directoryContent(path.normalize(path.parse(req.body.pathTo).dir))
     }
 }
 

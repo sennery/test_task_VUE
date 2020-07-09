@@ -41,19 +41,16 @@ export default {
         updateData2(path,fileName,disk){
             this.updateData(path,fileName,disk, 2);
         },
-        updateData(path, fileName, disk, sheet) {
-            this.sendPost((disk) ? fileName : path + '/' + fileName, 'open').then( (value) => {
-                if (sheet == 1) this.dirData1 = value;
-                else this.dirData2 = value;
-            });
+        async updateData(path, fileName, disk, sheet) {
+            if (sheet == 1) this.dirData1 = await this.sendPost(JSON.stringify({ path: (disk) ? fileName : path + '/' + fileName}), 'open');
+            else this.dirData2 = await this.sendPost(JSON.stringify({ path: (disk) ? fileName : path + '/' + fileName}), 'open');
         },
-        action(type) {
+        async action(type) {
             let request;
             let dir;
-            if(this.dirData1.fileList.some((e) => {
-                dir = e == this.current;
-                return dir;
-            })) request = {
+            let response;
+
+            if(dir = this.dirData1.path == this.current.path) request = {
                     obj : this.dirData1.path + '/' + this.current.fileName,
                     pathTo: this.dirData2.path + '/' + this.current.fileName
                 };
@@ -62,21 +59,21 @@ export default {
                     pathTo: this.dirData1.path + '/' + this.current.fileName
                 };
 
-            this.sendPost(JSON.stringify(request), type).then( (value) => {                
-                if(dir){
-                    this.dirData1 = value.dir1;
-                    this.dirData2 = value.dir2;
-                }else{
-                    this.dirData2 = value.dir1;
-                    this.dirData1 = value.dir2;
-                }
-            });
+            response = await this.sendPost(JSON.stringify(request), type);
+
+            if(dir){
+                this.dirData1 = response.dir1;
+                this.dirData2 = response.dir2;
+            }else{
+                this.dirData2 = response.dir1;
+                this.dirData1 = response.dir2;
+            }
         },
         async sendPost(req, type) {
             let response = await fetch(`http://localhost:3000/${type}`, {
                 method: 'POST',
                 headers: {
-                    "Content-type": "text/plain"
+                    "Content-type": "application/json"
                 },
                 body: req 
             });
@@ -85,9 +82,7 @@ export default {
         }
     },
     async mounted() {
-        this.sendPost('C:/', 'open').then( (value) => {
-            this.dirData1 = this.dirData2 = value;
-        });
+        this.dirData1 = this.dirData2 = await this.sendPost(JSON.stringify({path :'C:/'}), 'open');        
     }
 }
 </script>
