@@ -1,10 +1,16 @@
 <template>
     <div class='container'>
         <div class = 'wrapper'>
-            <Window v-on:curChanged = "changeCur" v-bind:dirData="dirData1" v-bind:current = "current" v-on:updateData = "update1Data"/>
-            <Window v-on:curChanged = "changeCur" v-bind:dirData="dirData2" v-bind:current = "current" v-on:updateData = "update2Data"/>
+            <Window v-on:curChanged = "changeCur" 
+                    v-bind:dirData= "dirData1" 
+                    v-bind:current = "current" 
+                    v-on:updateData = "updateData1"/>
+            <Window v-on:curChanged = "changeCur" 
+                    v-bind:dirData= "dirData2"
+                    v-bind:current = "current" 
+                    v-on:updateData = "updateData2"/>
         </div>
-        <Footer v-on:delete = "remove" v-on:move = "move" v-on:copy = "copy"/>
+        <Footer v-on:action = "action"/>
     </div>
 </template>
 
@@ -27,45 +33,21 @@ export default {
     },
     methods: {
         changeCur(current, path) {
-            this.current = current;
+            this.current = current;       
         },
-        update1Data(data) {
-            this.dirData1 = data;
+        updateData1(path,fileName,disk){
+            this.updateData(path,fileName,disk, 1);
         },
-        update2Data(data) {
-            this.dirData2 = data;
+        updateData2(path,fileName,disk){
+            this.updateData(path,fileName,disk, 2);
         },
-        async remove() {
-            let request;
-            let dir;
-
-            if(this.dirData1.fileList.some((e) => {
-                dir = e == this.current;
-                return dir;
-            })) request = this.dirData1.path + '/' + this.current.fileName;
-            else request = this.dirData2.path + '/' + this.current.fileName;
-
-            let response = await fetch('http://localhost:3000/remove', {
-                method: 'POST',
-                headers: {
-                    "Content-type": "text/plain"
-                },
-                body: request
+        updateData(path, fileName, disk, sheet) {
+            this.sendPost((disk) ? fileName : path + '/' + fileName, 'open').then( (value) => {
+                if (sheet == 1) this.dirData1 = value;
+                else this.dirData2 = value;
             });
-
-            let result = await response.json();
-
-            if(dir)this.dirData1 = result;
-            else this.dirData2 = result;
         },
-        move() {
-            this.moveOrCopy('move');
-        },
-        copy() {
-            this.moveOrCopy('copy')
-        },
-        async moveOrCopy(type) {
-            console.log(`http://localhost:3000/${type}`);
+        action(type) {
             let request;
             let dir;
             if(this.dirData1.fileList.some((e) => {
@@ -80,35 +62,32 @@ export default {
                     pathTo: this.dirData1.path + '/' + this.current.fileName
                 };
 
+            this.sendPost(JSON.stringify(request), type).then( (value) => {                
+                if(dir){
+                    this.dirData1 = value.dir1;
+                    this.dirData2 = value.dir2;
+                }else{
+                    this.dirData2 = value.dir1;
+                    this.dirData1 = value.dir2;
+                }
+            });
+        },
+        async sendPost(req, type) {
             let response = await fetch(`http://localhost:3000/${type}`, {
                 method: 'POST',
                 headers: {
                     "Content-type": "text/plain"
                 },
-                body: JSON.stringify(request)
+                body: req 
             });
-
             let result = await response.json();
-            if(dir){
-                this.dirData1 = result.dir1;
-                this.dirData2 = result.dir2;
-            }else{
-                this.dirData2 = result.dir1;
-                this.dirData1 = result.dir2;
-            }
+            return result;
         }
     },
     async mounted() {
-        let response = await fetch('http://localhost:3000', {
-                method: 'POST',
-                headers: {
-                    "Content-type": "text/plain"
-                },
-                body: 'C:/'
-            });
-        let result = await response.json();
-        this.dirData1 = result;
-        this.dirData2 = result;
+        this.sendPost('C:/', 'open').then( (value) => {
+            this.dirData1 = this.dirData2 = value;
+        });
     }
 }
 </script>
@@ -119,12 +98,25 @@ export default {
     flex-direction: column;
     width: 100vw;
     height: 100vh;
-    background-color: rgb(10, 54, 90);
+    background-color: rgb(96, 22, 162);
+    font-family: 'Gilroy';
 }
 
 .wrapper{
     display: flex;
     width: 100vw;
     height: 85vh;
+}
+
+@font-face {
+    font-family: 'Gilroy'; 
+    src: url(/fonts/Gilroy-Light.otf);
+    font-weight: light;
+}
+
+@font-face {
+    font-family: 'Gilroy'; 
+    src: url(/fonts/Gilroy-ExtraBold.otf);
+    font-weight: bold;
 }
 </style>

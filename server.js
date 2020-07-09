@@ -34,37 +34,31 @@ app.use(cors())
 
 app.get('/', (req, res) => res.sendFile('index.html'))
 
-app.post('/', (req,res) =>{
+app.post('/open', (req,res) =>{
     res.json(directoryContent(path.normalize(req.body)))
 })
 
 app.post('/move', (req,res) =>{
     fse.move(JSON.parse(req.body).obj, JSON.parse(req.body).pathTo, err => {
         if (err) return console.error(err)
-        res.json({
-            dir1: directoryContent(path.normalize(path.parse(JSON.parse(req.body).obj).dir)),
-            dir2: directoryContent(path.normalize(path.parse(JSON.parse(req.body).pathTo).dir))
-        })
+        res.json(responseForActions(req,res))
     })
 })
 
 app.post('/copy', (req,res) =>{
     fse.copy(JSON.parse(req.body).obj, JSON.parse(req.body).pathTo, err => {
         if (err) return console.error(err)
-        res.json({
-            dir1: directoryContent(path.normalize(path.parse(JSON.parse(req.body).obj).dir)),
-            dir2: directoryContent(path.normalize(path.parse(JSON.parse(req.body).pathTo).dir))
-        })
+        res.json(responseForActions(req,res))
     })
 })
 
 app.post('/remove', (req,res) =>{
     try {
-        remove.removeSync(path.normalize(req.body))
+        remove.removeSync(path.normalize(JSON.parse(req.body).obj))
     } catch(err) {
         console.log(err)
     }
-    res.json(directoryContent(path.parse(path.normalize(req.body)).dir))
+    res.json(responseForActions(req,res))
 })
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
@@ -103,6 +97,13 @@ function directoryContent(dirPath){
         path: dirPath,
         fileList: fileList,
         disksList: disksList
+    }
+}
+
+function responseForActions(req,res){
+    return {
+        dir1: directoryContent(path.normalize(path.parse(JSON.parse(req.body).obj).dir)),
+        dir2: directoryContent(path.normalize(path.parse(JSON.parse(req.body).pathTo).dir))
     }
 }
 

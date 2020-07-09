@@ -1,19 +1,19 @@
 <template>
     <div class="window">
         <Header
-            v-bind:currDir='dirData.path'
-            v-bind:availDisks='dirData.disksList'
-            v-on:backDir ='backDir'
-            v-on:goOtherDisk = "goOtherDisk"
+            v-bind:currDir= "dirData.path"
+            v-bind:availDisks= "dirData.disksList"
+            v-on:backDir = "updateData('..')"
+            v-on:goOtherDisk = "updateData"
         />
         <hr class="line">
         <div class = 'list'>
             <Element v-for="file in dirData.fileList"  
-                v-bind:class = "{selected: current === file}" 
+                v-bind:class = "{selected: select(file)}" 
                 v-on:click.native = "changeCur(file)" 
                 v-bind:key = "file.fileName"
                 v-bind:file = "file" 
-                v-on:openDir = "openDir"/>
+                v-on:openDir = "updateData"/>
         </div>
     </div>
 </template>
@@ -28,32 +28,24 @@ export default {
         return{}
     },
     methods: {
-        goOtherDisk(disk) {
-            this.sendPost(disk);
-        },
-        backDir() {
-            this.sendPost(this.dirData.path + '/..');
-        },
-        openDir(file) {           
-            if(file.type != 'directory') return
-            this.sendPost(this.dirData.path + '/' + file.fileName);    
-        },
-        async sendPost(path) {
-            let response = await fetch('http://localhost:3000', {
-                method: 'POST',
-                headers: {
-                    "Content-type": "text/plain"
-                },
-                body: path 
-            });
-            let result = await response.json();
-            this.updateData(result);
+        changeDisk(disk) {
+            this.$emit('updateData', this.dirData.path, disk)    
         },
         changeCur(file) {
-            this.$emit('curChanged', file);
+            this.$emit('curChanged', {...file, path: this.dirData.path});
         },
-        updateData(result) {
-            this.$emit('updateData', result);
+        updateData(fileName, disk) {
+            if(!disk) disk = false;
+            this.$emit('updateData', this.dirData.path, fileName, disk);
+        },
+        select(file) {
+            try {
+                return (this.current.fileName === file.fileName && this.current.path === this.dirData.path);
+            }
+            catch (e) {
+                console.log(e);
+                return false;
+            }
         }
     },
     name: 'Window',
@@ -77,6 +69,7 @@ export default {
 }
 .line{
     width: 90%;
+    margin: 0 auto;
 }
 .list {
     display: flex;

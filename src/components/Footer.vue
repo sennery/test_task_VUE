@@ -1,8 +1,8 @@
 <template>
     <div class="footer">
-        <button v-on:click = "$emit('move')" class='button'>Переместить</button>
-        <button v-on:click = "$emit('copy')" class='button'>Скопировать</button>
-        <button v-on:click = "$emit('delete')" class='button'>Удалить</button>
+        <button v-on:click = "$emit('action', 'move')" class='button'>Переместить</button>
+        <button v-on:click = "$emit('action', 'copy')" class='button'>Скопировать</button>
+        <button v-on:click = "$emit('action', 'remove')" class='button'>Удалить</button>
     </div>
 </template>
 
@@ -25,5 +25,7 @@ export default {
     border-radius: 5px;
     background-color:white;
     cursor: pointer;
+    font-family: 'Gilroy';
+    font-size: 120%;
 }
 </style>

@@ -1,10 +1,10 @@
 <template>
     <div class = 'header'>
-        <select class = "sel" v-model = 'selected' v-on:change = "$emit('goOtherDisk', selected)">
+        <select class = "sel" v-model = 'selected' v-on:change = "$emit('goOtherDisk', selected, true)">
             <option v-for="disk in availDisks" v-bind:key="disk">{{disk}}</option>
         </select>
-        <div class = 'header-elements text'>{{currDir}}</div>
-        <button class = 'header-elements but' v-on:click = "$emit('backDir')">/</button>
+        <div class = 'text'>{{currDir}}</div>
+        <button class = 'but' v-on:click = "$emit('backDir')">/</button>
     </div>
 </template>
 
@@ -33,6 +33,7 @@ export default {
 .text{
     font-size: 1.2rem;
     text-align: center;
+    font-weight: bold;
 }
 .but{
     width: 5%;
