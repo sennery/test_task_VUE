@@ -1,10 +1,10 @@
 <template>
-    <div class = 'header'>
-        <select class = "sel" v-model = 'selected' v-on:change = "$emit('goOtherDisk', selected, true)">
-            <option v-for="disk in availDisks" v-bind:key="disk">{{disk}}</option>
+    <div class="header">
+        <select class="sel" v-model="selected" @change="$emit('goOtherDisk', selected, true)">
+            <option v-for="disk in availDisks" :key="disk">{{disk}}</option>
         </select>
-        <div class = 'text'>{{currDir}}</div>
-        <button class = 'but' v-on:click = "$emit('backDir')">/</button>
+        <div class="text">{{currDir}}</div>
+        <button class="but" @click="$emit('backDir')">/</button>
     </div>
 </template>
 

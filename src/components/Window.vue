@@ -1,19 +1,19 @@
 <template>
     <div class="window">
         <Header
-            v-bind:currDir= "dirData.path"
-            v-bind:availDisks= "dirData.disksList"
-            v-on:backDir = "updateData('..')"
-            v-on:goOtherDisk = "updateData"
+            :currDir="dirData.path"
+            :availDisks="dirData.disksList"
+            @backDir="updatePath('..')"
+            @goOtherDisk="updatePath"
         />
         <hr class="line">
-        <div class = 'list'>
+        <div class="list">
             <Element v-for="file in dirData.fileList"  
-                v-bind:class = "{selected: select(file)}" 
-                v-on:click.native = "changeCur(file)" 
-                v-bind:key = "file.fileName"
-                v-bind:file = "file" 
-                v-on:openDir = "updateData"/>
+                :class="{selected: select(file)}" 
+                :key="file.fileName"
+                :file="file" 
+                @openDir="updatePath"
+                @click.native="changeCur(file)" />
         </div>
     </div>
 </template>
@@ -21,22 +21,30 @@
 <script>
 import Header from './Header'
 import Element from './Element'
+import {rest} from '../assets/Rest.js'
 
 export default {
-    props : ['dirData', 'current'],
+    props : ['current', 'path', 'number'],
+    name: 'Window',
     data() {
-        return{}
+        return{
+            dirData: {},
+        }
+    },
+    components: {
+        Header,
+        Element
     },
     methods: {
-        changeDisk(disk) {
-            this.$emit('updateData', this.dirData.path, disk)    
-        },
         changeCur(file) {
-            this.$emit('curChanged', {...file, path: this.dirData.path});
+            this.$emit('curChanged', {...file, path: this.dirData.path, number: this.number});            
         },
-        updateData(fileName, disk) {
-            if(!disk) disk = false;
-            this.$emit('updateData', this.dirData.path, fileName, disk);
+        updatePath(pathTo, disk) {
+            this.updateData((disk) ? pathTo : this.dirData.path + '/' + pathTo);
+        },
+        async updateData(pathTo) {
+            this.dirData = await rest.getContent(pathTo);
+            this.$emit('updateData', this.dirData.path, this.number);
         },
         select(file) {
             try {
@@ -48,10 +56,13 @@ export default {
             }
         }
     },
-    name: 'Window',
-    components: {
-        Header,
-        Element
+    watch: {
+        current: async function() {
+            this.dirData = await rest.getContent(this.dirData.path);
+        }
+    },
+    async mounted() {
+        this.dirData = await rest.getContent(this.path);
     }
 }
 </script>

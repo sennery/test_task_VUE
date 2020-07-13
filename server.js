@@ -41,14 +41,14 @@ app.post('/open', (req,res) => {
 app.post('/move', (req,res) => {
     fse.move(req.body.obj, req.body.pathTo, err => {
         if (err) return console.error(err)
-        res.json(responseForActions(req,res))
+        res.json({});
     })
 })
 
 app.post('/copy', (req,res) => {
     fse.copy(req.body.obj, req.body.pathTo, err => {
         if (err) return console.error(err)
-        res.json(responseForActions(req,res))
+        res.json({});
     })
 })
 
@@ -58,7 +58,7 @@ app.post('/remove', (req,res) => {
     } catch(err) {
         console.log(err)
     }
-    res.json(responseForActions(req,res))
+    res.json({});
 })
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
