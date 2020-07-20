@@ -41,7 +41,6 @@ export default {
             this.current = current;      
         },
         updatePanels(path, n) {
-            console.log(path);
             this.$set(this.panels, n, path);  
         },
         async remove() {

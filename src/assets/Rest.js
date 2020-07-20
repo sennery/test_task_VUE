@@ -1,31 +1,32 @@
-function RestConstructor() {    
-    this.getContent = (path) => {
-        return sendPost(JSON.stringify({path : path}), 'open');
+class RestConstructor {
+    getContent(path) {
+        return this.sendPost({ path: path }, 'open');
     };
 
-    this.removeFile = (path) => {
-        return sendPost(JSON.stringify({obj : path}), 'remove');
+    removeFile(path) {
+        return this.sendPost({ obj: path }, 'remove');
     };
 
-    this.moveFile = (obj, pathTo) => {
-        return sendPost(JSON.stringify({obj : obj, pathTo: pathTo}), 'move');
+    moveFile(obj, pathTo) {
+        return this.sendPost({ obj: obj, pathTo: pathTo }, 'move');
     };
 
-    this.copyFile = (obj, pathTo) => {
-        return sendPost(JSON.stringify({obj : obj, pathTo: pathTo}), 'copy');
+    copyFile(obj, pathTo) {
+        return this.sendPost({ obj: obj, pathTo: pathTo }, 'copy');
     };
 
-    async function sendPost(req, type) {
-        let response = await fetch(`http://localhost:3000/${type}`, {
+    async sendPost(req, type) {
+        const response = await fetch(`http://localhost:3000/${type}`, {
             method: 'POST',
             headers: {
                 "Content-type": "application/json"
             },
-            body: req 
+            body: JSON.stringify(req)
         });
-        let result = await response.json();
+        const result = await response.json();
         return result;
     };
-};
+}
+;
 
-export let rest = new RestConstructor();
+export const rest = new RestConstructor();

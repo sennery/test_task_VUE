@@ -24,7 +24,11 @@ import Element from './Element'
 import {rest} from '../assets/Rest.js'
 
 export default {
-    props : ['current', 'path', 'number'],
+    props : {
+        current: Object,
+        path: String,
+        number: Number
+    },
     name: 'Window',
     data() {
         return{
@@ -57,7 +61,7 @@ export default {
         }
     },
     watch: {
-        current: async function() {
+        async current() {
             this.dirData = await rest.getContent(this.dirData.path);
         }
     },

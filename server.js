@@ -7,9 +7,7 @@ const remove = require('remove');
 const bodyParser = require('body-parser')
 const app = express()
 const port = 3000
-
-let disksList = []
-let fileTypes = [
+const fileTypes = [
     { fileType: 'video' , fileExt: '.wmv'},
     { fileType: 'video' , fileExt: '.mp4'},
     { fileType: 'video' , fileExt: '.avi'},
@@ -23,12 +21,11 @@ let fileTypes = [
     { fileType: 'document' , fileExt: '.xlsx'},
     { fileType: 'program' , fileExt: '.exe'}
 ]
+let disksList = []
 
 app.use(express.static(path.join(__dirname, 'dist')))
 
 app.use(bodyParser.json())
-
-app.use(bodyParser.text())
 
 app.use(cors())
 
@@ -100,19 +97,16 @@ function directoryContent(dirPath) {
     }
 }
 
-function responseForActions(req,res) {
-    return {
-        dir1: directoryContent(path.normalize(path.parse(req.body.obj).dir)),
-        dir2: directoryContent(path.normalize(path.parse(req.body.pathTo).dir))
-    }
-}
-
 function typeOfFile(name) {
-    return (fileTypes.find( file => file.fileExt === path.extname(name))) ? fileTypes.find( file => file.fileExt === path.extname(name)).fileType : 'file'
+    const type = fileTypes.find( 
+        file => file.fileExt === path.extname(name)
+    );
+    return (type) ? type.fileType : 'file'
 }
 
 function readableSize(size) {
-    var i = 0, type = ['б','Кб','Мб','Гб','Тб','Пб'];
+    let i = 0;
+    const type = ['б','Кб','Мб','Гб','Тб','Пб'];
     while((size / 1000 | 0) && i < type.length - 1) {
 	    size /= 1024;
 	    i++;
