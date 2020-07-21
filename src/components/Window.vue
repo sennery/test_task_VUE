@@ -67,11 +67,11 @@ export default {
     },
     watch: {
         async current() {
-            this.dirData = await rest.getContent(this.dirData.path);
+            if(!this.current) this.updateData(this.dirData.path);
         }
     },
     async mounted() {
-        this.dirData = await rest.getContent(this.path);
+        this.updateData(this.path);
     }
 }
 </script>

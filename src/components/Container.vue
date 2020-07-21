@@ -58,17 +58,17 @@ export default {
         },
         async remove() {
             await rest.removeFile(this.current.path + '/' + this.current.fileName);
-            this.current = '';        
+            this.current = null;        
         },
         async move() {
             await rest.moveFile(this.current.path + '/' + this.current.fileName, 
                 (this.current.path == this.panels[0]) ? this.panels[1] + '/' + this.current.fileName : this.panels[0] + '/' + this.current.fileName);
-            this.current = '';        
+            this.current = null;        
         },
         async copy() {
              await rest.copyFile(this.current.path + '/' + this.current.fileName, 
                 (this.current.path == this.panels[0]) ? this.panels[1] + '/' + this.current.fileName : this.panels[0] + '/' + this.current.fileName);
-            this.current = '';            
+            this.current = null;            
         }
     }
 }
