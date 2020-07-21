@@ -1,27 +1,30 @@
 <template>
     <div class="container">
         <div class="wrapper">
-            <Window @curChanged="changeCur"
+            <Window v-for="(item,index) in panels"
+                    @curChanged="changeCur"
                     @updateData="updatePanels"
+                    :key="index"
                     :current="current" 
-                    :path="panels[0]"
-                    :number="0"/>
-            <Window @curChanged="changeCur" 
-                    @updateData="updatePanels"
-                    :current="current"
-                    :path="panels[1]"
-                    :number="1"/>
+                    :path="panels[index]"
+                    :number="index"
+                    @showError="showError"/>
         </div>
-        <Footer @remove="remove"
-                @move="move"
-                @copy="copy"/>
+        <Footer @action="action"/>
+        <transition name="modal">                
+            <Modal v-if="showModal" @close="showModal = false">
+                {{ errMessage }}
+            </Modal>        
+        </transition>
     </div>
 </template>
 
 <script>
 import Window from './Window'
 import Footer from './Footer'
+import Modal from './Modal.vue'
 import {rest} from '../assets/Rest.js'
+
 
 export default {
     name: 'Container',
@@ -29,33 +32,43 @@ export default {
         return {
             panels: ['C:/', 'C:/'],
             refreshOnChange: false,
-            current: null
+            current: null,
+            showModal: false,
+            errMessage: ''
         }
     },
     components: {
         Window,
-        Footer
+        Footer,
+        Modal
     },
     methods: {
+        showError(message) {
+            this.errMessage = message;
+            this.showModal = true;
+        },
         changeCur(current, path) {
             this.current = current;      
         },
         updatePanels(path, n) {
             this.$set(this.panels, n, path);  
         },
+        action(name) {
+            this[name]().catch( err => this.showError(err.message) );
+        },
         async remove() {
             await rest.removeFile(this.current.path + '/' + this.current.fileName);
-            this.current = ''; 
+            this.current = '';        
         },
         async move() {
             await rest.moveFile(this.current.path + '/' + this.current.fileName, 
                 (this.current.path == this.panels[0]) ? this.panels[1] + '/' + this.current.fileName : this.panels[0] + '/' + this.current.fileName);
-            this.current = '';
+            this.current = '';        
         },
         async copy() {
-            await rest.copyFile(this.current.path + '/' + this.current.fileName, 
+             await rest.copyFile(this.current.path + '/' + this.current.fileName, 
                 (this.current.path == this.panels[0]) ? this.panels[1] + '/' + this.current.fileName : this.panels[0] + '/' + this.current.fileName);
-            this.current = '';
+            this.current = '';            
         }
     }
 }

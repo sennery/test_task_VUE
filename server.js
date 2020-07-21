@@ -32,31 +32,48 @@ app.use(cors())
 app.get('/', (req, res) => res.sendFile('index.html'))
 
 app.post('/open', (req,res) => {
-    res.json(directoryContent(path.normalize(req.body.path)))
+    try {
+        res.json(directoryContent(path.normalize(req.body.path)))
+    }
+    catch(err) {
+        throw new Error('Не удалось открыть директорию (' + err.message + ')')
+    }
 })
 
 app.post('/move', (req,res) => {
-    fse.move(req.body.obj, req.body.pathTo, err => {
-        if (err) return console.error(err)
+    try {
+        fse.moveSync(req.body.obj, req.body.pathTo)
         res.json({});
-    })
+    }
+    catch(err) {
+        throw new Error('Не удалось переместить файл (' + err.message + ')')
+    }
 })
 
 app.post('/copy', (req,res) => {
-    fse.copy(req.body.obj, req.body.pathTo, err => {
-        if (err) return console.error(err)
+    try {
+        fse.copySync(req.body.obj, req.body.pathTo)
         res.json({});
-    })
+    }
+    catch(err) {
+        throw new Error('Не удалось скопировать файл (' + err.message + ')')
+    }
 })
 
 app.post('/remove', (req,res) => {
     try {
         remove.removeSync(path.normalize(req.body.obj))
-    } catch(err) {
-        console.log(err)
+        res.json({});
     }
-    res.json({});
+    catch(err) {
+        throw new Error('Не удалось удалить файл (' + err.message + ')')
+    }
 })
+
+app.use((error, req, res, next) => {
+    res.status(500)
+    res.json({ message: error.message })
+  })
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 

@@ -47,7 +47,12 @@ export default {
             this.updateData((disk) ? pathTo : this.dirData.path + '/' + pathTo);
         },
         async updateData(pathTo) {
-            this.dirData = await rest.getContent(pathTo);
+            try {                
+                this.dirData = await rest.getContent(pathTo);
+            }
+            catch(err) {
+                this.$emit('showError', err.message);
+            }
             this.$emit('updateData', this.dirData.path, this.number);
         },
         select(file) {

@@ -1,8 +1,8 @@
 <template>
     <div class="footer">
-        <button @click="$emit('move')" class="button">Переместить</button>
-        <button @click="$emit('copy')" class="button">Скопировать</button>
-        <button @click="$emit('remove')" class="button">Удалить</button>
+        <button @click="$emit('action','move')" class="button">Переместить</button>
+        <button @click="$emit('action','copy')" class="button">Скопировать</button>
+        <button @click="$emit('action','remove')" class="button">Удалить</button>
     </div>
 </template>
 

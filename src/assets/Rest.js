@@ -17,13 +17,16 @@ class RestConstructor {
 
     async sendPost(req, type) {
         const response = await fetch(`http://localhost:3000/${type}`, {
-            method: 'POST',
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify(req)
+                method: 'POST',
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(req)
         });
         const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message)
+        }
         return result;
     };
 }
