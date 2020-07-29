@@ -7,9 +7,7 @@ const remove = require('remove');
 const bodyParser = require('body-parser')
 const app = express()
 const port = 3000
-
-let disksList = []
-let fileTypes = [
+const fileTypes = [
     { fileType: 'video' , fileExt: '.wmv'},
     { fileType: 'video' , fileExt: '.mp4'},
     { fileType: 'video' , fileExt: '.avi'},
@@ -23,43 +21,59 @@ let fileTypes = [
     { fileType: 'document' , fileExt: '.xlsx'},
     { fileType: 'program' , fileExt: '.exe'}
 ]
+let disksList = []
 
 app.use(express.static(path.join(__dirname, 'dist')))
 
 app.use(bodyParser.json())
-
-app.use(bodyParser.text())
 
 app.use(cors())
 
 app.get('/', (req, res) => res.sendFile('index.html'))
 
 app.post('/open', (req,res) => {
-    res.json(directoryContent(path.normalize(req.body.path)))
+    try {
+        res.json(directoryContent(path.normalize(req.body.path)))
+    }
+    catch(err) {
+        throw new Error(`Не удалось открыть директорию ${path.normalize(req.body.path)}: "${err.message}"`)
+    }
 })
 
 app.post('/move', (req,res) => {
-    fse.move(req.body.obj, req.body.pathTo, err => {
-        if (err) return console.error(err)
-        res.json(responseForActions(req,res))
-    })
+    try {
+        fse.moveSync(req.body.obj, req.body.pathTo)
+        res.json({});
+    }
+    catch(err) {
+        throw new Error(`Не удалось переместить файл ${path.normalize(req.body.obj)}: "${err.message}"`)
+    }
 })
 
 app.post('/copy', (req,res) => {
-    fse.copy(req.body.obj, req.body.pathTo, err => {
-        if (err) return console.error(err)
-        res.json(responseForActions(req,res))
-    })
+    try {
+        fse.copySync(req.body.obj, req.body.pathTo)
+        res.json({});
+    }
+    catch(err) {
+        throw new Error(`Не удалось скопировать файл ${path.normalize(req.body.obj)}: "${err.message}"`)
+    }
 })
 
 app.post('/remove', (req,res) => {
     try {
         remove.removeSync(path.normalize(req.body.obj))
-    } catch(err) {
-        console.log(err)
+        res.json({});
     }
-    res.json(responseForActions(req,res))
+    catch(err) {
+        throw new Error(`Не удалось скопировать файл ${path.normalize(req.body.obj)}: "${err.message}"`)
+    }
 })
+
+app.use((error, req, res, next) => {
+    res.status(500)
+    res.json({ message: error.message })
+  })
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
@@ -100,19 +114,16 @@ function directoryContent(dirPath) {
     }
 }
 
-function responseForActions(req,res) {
-    return {
-        dir1: directoryContent(path.normalize(path.parse(req.body.obj).dir)),
-        dir2: directoryContent(path.normalize(path.parse(req.body.pathTo).dir))
-    }
-}
-
 function typeOfFile(name) {
-    return (fileTypes.find( file => file.fileExt === path.extname(name))) ? fileTypes.find( file => file.fileExt === path.extname(name)).fileType : 'file'
+    const type = fileTypes.find( 
+        file => file.fileExt === path.extname(name)
+    );
+    return (type) ? type.fileType : 'file'
 }
 
 function readableSize(size) {
-    var i = 0, type = ['б','Кб','Мб','Гб','Тб','Пб'];
+    let i = 0;
+    const type = ['б','Кб','Мб','Гб','Тб','Пб'];
     while((size / 1000 | 0) && i < type.length - 1) {
 	    size /= 1024;
 	    i++;
