@@ -36,7 +36,7 @@ app.post('/open', (req,res) => {
         res.json(directoryContent(path.normalize(req.body.path)))
     }
     catch(err) {
-        throw new Error('Не удалось открыть директорию (' + err.message + ')')
+        throw new Error(`Не удалось открыть директорию ${path.normalize(req.body.path)}: "${err.message}"`)
     }
 })
 
@@ -46,7 +46,7 @@ app.post('/move', (req,res) => {
         res.json({});
     }
     catch(err) {
-        throw new Error('Не удалось переместить файл (' + err.message + ')')
+        throw new Error(`Не удалось переместить файл ${path.normalize(req.body.obj)}: "${err.message}"`)
     }
 })
 
@@ -56,7 +56,7 @@ app.post('/copy', (req,res) => {
         res.json({});
     }
     catch(err) {
-        throw new Error('Не удалось скопировать файл (' + err.message + ')')
+        throw new Error(`Не удалось скопировать файл ${path.normalize(req.body.obj)}: "${err.message}"`)
     }
 })
 
@@ -66,7 +66,7 @@ app.post('/remove', (req,res) => {
         res.json({});
     }
     catch(err) {
-        throw new Error('Не удалось удалить файл (' + err.message + ')')
+        throw new Error(`Не удалось скопировать файл ${path.normalize(req.body.obj)}: "${err.message}"`)
     }
 })
 
